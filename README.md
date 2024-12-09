@@ -17,6 +17,7 @@ This is a Project Management fullstack application that uses GraphQL API and Mon
   5. How to mutate clients
   6. Database connections
   7. Mongoose models
+  8. Apollo caching
   
 ## Errors  I Faced
 
