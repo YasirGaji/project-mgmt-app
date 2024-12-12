@@ -103,19 +103,8 @@ const mutation = new GraphQLObjectType({
       },
     },
 
-    // Deletes a client
+    // Adds Project
 
-    deleteClient: {
-      type: ClientType,
-      args: {
-        id: { type: GraphQLNonNull(GraphQLID) },
-      },
-      resolve(parent, args) {
-        return Client.findByIdAndDelete(args.id);
-      },
-    },
-
-    // Add Project
     addProject: {
       type: ProjectType,
       args: {
@@ -143,6 +132,43 @@ const mutation = new GraphQLObjectType({
         });
 
         return project.save();
+      },
+    },
+
+    // Deletes a client
+
+    // deleteClient: {
+    //   type: ClientType,
+    //   args: {
+    //     id: { type: GraphQLNonNull(GraphQLID) },
+    //   },
+    //   resolve(parent, args) {
+    //     Project.find({ clientId: args.id }).then((projects) => {
+    //       projects.forEach(project => {
+    //         project.deleteMany({ clientId: args.id })
+    //       })
+    //     })
+
+    //     return Client.findByIdAndDelete(args.id);
+    //   },
+    // },
+
+    deleteClient: {
+      type: ClientType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+      },
+      async resolve(parent, args) {
+        try {
+          // Delete all projects for this client in one operation
+          await Project.deleteMany({ clientId: args.id });
+
+          // Delete and return the client
+          return await Client.findByIdAndDelete(args.id);
+        } catch (error) {
+          console.log('Error deleting client: ', error);
+          throw new Error('Error deleting client');
+        }
       },
     },
 
